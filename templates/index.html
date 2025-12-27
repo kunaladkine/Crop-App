@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- 🌄 HERO SECTION -->
+<div class="text-center p-5 rounded-4" style="background:linear-gradient(135deg,#4ac29a,#5b86e5); color:white;">
+    <h1 class="fw-bold display-4">🌾 AgroSmart</h1>
+    <p class="lead">AI powered farming solutions — Crop Recommendation, Weather Insights & Smart Tools</p>
+    <a href="/crop" class="btn btn-light btn-lg mt-3 shadow">Try Crop Recommendation →</a>
+</div>
+
+<!-- 👇 POPULAR CROPS -->
+<h2 class="fw-bold mt-5 text-center">🌱 Popular Crops</h2>
+<div class="row mt-3 g-4">
+    {% for crop in crops %}
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 rounded-4">
+            <img src="{{ url_for('static', filename='img/' + crop.img) }}" class="card-img-top" style="height:180px; object-fit:cover; border-top-left-radius:18px; border-top-right-radius:18px;">
+            <div class="card-body text-center">
+                <h5 class="fw-bold">{{ crop.name }}</h5>
+                <a href="/crop" class="btn btn-success btn-sm mt-2">Check Suitability</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- 🚜 OUR PRODUCTS -->
+<h2 class="fw-bold mt-5 text-center">🛠️ Our Products</h2>
+<p class="text-center text-muted mb-4">Browse latest smart farming equipment</p>
+
+<div class="row mt-3 g-4">
+    {% for item in tools %}
+    <div class="col-md-4">
+        <div class="card shadow border-0 p-3 rounded-4">
+            <img src="{{ url_for('static', filename='uploads/' + item.img) }}"
+                 class="rounded-3" style="height:200px; width:100%; object-fit:cover;">
+            
+            <h5 class="text-center mt-3 fw-bold">{{ item.name }}</h5>
+            <p class="text-center text-success fw-bold">₹{{ item.price }}</p>
+
+            <div class="d-flex gap-2">
+                <a href="/equipment" class="btn btn-outline-primary w-100">View</a>
+                <a href="/cart/add/{{ item.id }}" class="btn btn-success w-100">Add to Cart 🛒</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="text-center mt-4">
+    <a href="/equipment" class="btn btn-primary btn-lg">See All Products →</a>
+</div>
+
+
+{% endblock %}

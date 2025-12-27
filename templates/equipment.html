@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- 🔍 SEARCH + FILTER BAR -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <input type="text" id="searchBox" placeholder="Search tools..." class="form-control w-50 me-2">
+    <select id="categoryFilter" class="form-select w-25">
+        <option value="">All Categories</option>
+        {% for cat in categories %}
+        <option value="{{ cat }}">{{ cat }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<h2 class="text-center fw-bold mb-3">🚜 Farming Tools Marketplace</h2>
+
+<!-- 🛍️ TOOLS GRID -->
+<div class="row g-4" id="toolContainer">
+    {% for item in tools %}
+    <div class="col-md-4 tool-card" data-category="{{ item.category }}" data-name="{{ item.name|lower }}">
+        <div class="card shadow border-0 position-relative overflow-hidden rounded-4 toolBox">
+            
+            <span class="badge bg-success position-absolute top-0 end-0 mt-2 me-2">New</span>
+            
+            <img src="{{ url_for('static', filename='uploads/' + item.img) }}"
+     class="card-img-top" style="height:220px; object-fit:cover;">
+
+            <div class="card-body">
+                <h5 class="fw-bold">{{ item.name }}</h5>
+                <p class="text-muted mb-1">{{ item.category }}</p>
+                
+                <!-- ⭐ RATING -->
+                <p>
+                    {% for i in range(item.rating) %}
+                    ⭐
+                    {% endfor %}
+                </p>
+                
+                <p class="fs-4 text-success fw-bold">{{ item.price }}</p>
+                
+                <a href="/cart/add/{{ item.id }}" class="btn btn-primary w-100 mt-2">
+  🛒 Add to Cart
+</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+const searchBox = document.getElementById("searchBox");
+const categoryFilter = document.getElementById("categoryFilter");
+const toolCards = document.querySelectorAll(".tool-card");
+
+function filterTools() {
+  const query = searchBox.value.toLowerCase();
+  const category = categoryFilter.value;
+
+  toolCards.forEach(card => {
+    const name = card.dataset.name;
+    const cat = card.dataset.category;
+    const matchSearch = name.includes(query);
+    const matchCategory = category === "" || cat === category;
+    card.style.display = (matchSearch && matchCategory) ? "block" : "none";
+  });
+}
+
+searchBox.addEventListener("input", filterTools);
+categoryFilter.addEventListener("change", filterTools);
+</script>
+
+
+{% endblock %}

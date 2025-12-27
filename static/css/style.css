@@ -1,0 +1,85 @@
+body{
+  font-family: 'Poppins', sans-serif;
+  background: #f4fff9;
+}
+
+.navbar-custom {
+  background: linear-gradient(90deg, #4ac29a, #5b86e5);
+}
+
+.footer {
+  background: linear-gradient(90deg, #5b86e5, #36d1dc);
+  color: white;
+  padding: 15px 0;
+  text-align: center;
+  margin-top: 40px;
+}
+
+
+.card {
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.10);
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    transition: 0.3s ease;
+}
+
+.btn {
+    border-radius: 10px;
+}
+
+.rounded-4 { border-radius: 18px; }
+
+
+/* Floating Button */
+
+#langBtn{
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: linear-gradient(135deg,#4ac29a,#5b86e5);
+  color: white;
+  font-size: 28px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 60px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 9999;
+}
+
+#google_translate_element {
+    position: fixed;
+    bottom: 100px;
+    right: 25px;
+    background: white;
+    padding: 4px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 9998;
+}
+.goog-te-gadget-simple {
+    background: transparent!important;
+    border: none!important;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Equiptment Search */
+
+.toolBox:hover {
+  transform: translateY(-8px);
+  transition: 0.4s;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.toolBox img {
+  transition: 0.4s;
+}
+.toolBox:hover img {
+  transform: scale(1.05);
+}

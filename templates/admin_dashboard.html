@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4">📊 Admin Dashboard</h2>
+
+    <div class="row justify-content-center">
+
+        <!-- Tools -->
+        <div class="col-md-4">
+            <div class="card shadow p-4 text-center border-0" style="border-radius:15px;">
+                <h3>🛠️ Tools</h3>
+                <p>View, Add, Edit, Delete Tools</p>
+                <a href="/admin/tools" class="btn btn-primary w-100">Manage Tools</a>
+            </div>
+        </div>
+
+        <!-- Orders -->
+        <div class="col-md-4">
+            <div class="card shadow p-4 text-center border-0" style="border-radius:15px;">
+                <h3>📦 Orders</h3>
+                <p>View & Update Customer Orders</p>
+                <a href="/admin/orders" class="btn btn-success w-100">Manage Orders</a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

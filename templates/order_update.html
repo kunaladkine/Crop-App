@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Update Order #{{ order.id }}</h2>
+
+<form method="POST" class="w-50 mx-auto">
+
+  <label class="fw-bold">Select Status:</label>
+  <select name="status" class="form-select mb-3">
+      <option {{ "selected" if order.status=="Pending" }}>Pending</option>
+      <option {{ "selected" if order.status=="Confirmed" }}>Confirmed</option>
+      <option {{ "selected" if order.status=="Shipped" }}>Shipped</option>
+      <option {{ "selected" if order.status=="Delivered" }}>Delivered</option>
+      <option {{ "selected" if order.status=="Closed" }}>Closed</option>
+  </select>
+
+  <button class="btn btn-primary w-100">Save Update</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container p-5" style="max-width:600px;">
+    <h2 class="mb-4 text-center">🧾 Checkout Details</h2>
+
+    <form method="POST">
+
+        <label class="form-label fw-bold">Full Name</label>
+        <input type="text" name="name" required class="form-control mb-3" placeholder="Your Name">
+
+        <label class="form-label fw-bold">Phone Number</label>
+        <input type="tel" name="phone" required class="form-control mb-3" placeholder="Your Phone">
+
+        <button class="btn btn-success w-100 btn-lg">Proceed to WhatsApp Order 🚀</button>
+    </form>
+
+    <div class="text-center mt-3">
+        <a href="/cart">← Back to Cart</a>
+    </div>
+
+</div>
+
+{% endblock %}

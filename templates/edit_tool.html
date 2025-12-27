@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Edit Tool</h2>
+
+<form method="POST" enctype="multipart/form-data">
+
+  <input class="form-control my-2" name="name" value="{{ tool.name }}">
+  <input class="form-control my-2" name="price" value="{{ tool.price }}">
+  <input class="form-control my-2" name="category" value="{{ tool.category }}">
+  <input class="form-control my-2" name="rating" value="{{ tool.rating }}">
+
+  <p>Current Image:</p>
+  <img src="{{ url_for('static', filename='uploads/' + tool.img) }}" width="120" class="mb-2">
+
+  <label class="fw-bold mt-3">Replace with new image</label>
+  <input type="file" class="form-control" name="img" accept="image/*">
+
+  <button class="btn btn-success w-100 mt-3">Update</button>
+</form>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>🌱 Crop Recommendation</h2>
+
+<form method="POST">
+ <input type="number" name="N" class="form-control my-2" placeholder="Nitrogen">
+ <input type="number" name="P" class="form-control my-2" placeholder="Phosphorus">
+ <input type="number" name="K" class="form-control my-2" placeholder="Potassium">
+ <input type="number" step="0.1" name="ph" class="form-control my-2" placeholder="pH">
+ <input type="number" name="rain" class="form-control my-2" placeholder="Rainfall (mm)">
+ <input type="number" name="temp" class="form-control my-2" placeholder="Temp (°C)">
+ <input type="number" name="humidity" class="form-control my-2" placeholder="Humidity %">
+ <button class="btn btn-primary mt-3 w-100">Recommend Crop</button>
+</form>
+
+{% endblock %}

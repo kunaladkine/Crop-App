@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+
+<h2 class="fw-bold mb-4">🛒 Your Cart</h2>
+
+{% if cart_items %}
+<table class="table table-bordered align-middle text-center">
+  <thead class="table-light">
+    <tr>
+      <th>Image</th>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Remove</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for item in cart_items %}
+    <tr>
+      <td><img src="{{ url_for('static', filename='uploads/' + item.img) }}" width="80" class="rounded"></td>
+      <td class="fw-bold">{{ item.name }}</td>
+      <td class="text-success fw-bold">₹{{ item.price }}</td>
+      <td><a href="/cart/remove/{{ item.id }}" class="btn btn-danger btn-sm">❌</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="d-flex justify-content-between mt-3">
+  <a href="/cart/clear" class="btn btn-warning">🧹 Clear Cart</a>
+  <a href="/checkout" class="btn btn-primary btn-lg">Proceed to Checkout →</a>
+</div>
+
+{% else %}
+<!-- 🌟 Empty Cart Message -->
+<div class="text-center p-5 border rounded-4" style="background:#f9f9f9;">
+  <h3 class="mb-3">🛒 Your cart is empty!</h3>
+  <a href="/equipment" class="btn btn-success btn-lg">Browse Products →</a>
+</div>
+{% endif %}
+
+</div>
+
+{% endblock %}
