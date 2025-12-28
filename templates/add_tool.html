@@ -1,16 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Add New Tool</h2>
 
-<form method="POST" enctype="multipart/form-data">
-  <input class="form-control my-2" name="name" placeholder="Tool Name" required>
-  <input class="form-control my-2" name="price" placeholder="Price" required>
-  <input class="form-control my-2" name="category" placeholder="Category" required>
-  <input class="form-control my-2" name="rating" placeholder="Rating (1-5)" required>
+<h2 class="mb-4">➕ Add New Tool</h2>
 
-  <label class="mt-3 fw-bold">Upload Image</label>
-  <input type="file" class="form-control my-2" name="img" accept="image/*" required>
+<form method="POST">
 
-  <button class="btn btn-primary w-100 mt-3">Save</button>
+  <div class="mb-3">
+    <label>Name</label>
+    <input type="text" name="name" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Price</label>
+    <input type="text" name="price" class="form-control" placeholder="₹5000" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Category</label>
+    <input type="text" name="category" class="form-control" placeholder="E.g., Irrigation, Soil Tools" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Rating</label>
+    <select name="rating" class="form-select">
+      <option>5</option>
+      <option>4</option>
+      <option>3</option>
+      <option>2</option>
+      <option>1</option>
+    </select>
+  </div>
+
+  <button class="btn btn-success w-100 mt-3">Add Tool</button>
 </form>
+
 {% endblock %}

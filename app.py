@@ -191,15 +191,13 @@ def add_tool():
     if "admin" not in session: return redirect("/admin")
 
     if request.method == "POST":
-        image = request.files.get("img")
-        img_url = None
-
-        if image and image.filename != "" and allowed_file(image.filename):
-            try:
-                upload = cloudinary.uploader.upload(image)
-                img_url = upload.get("secure_url")
-            except:
-                img_url = None  # ⭐ If fails, still save tool
+        Tool(
+    name=request.form["name"],
+    price=request.form["price"],
+    category=request.form["category"],
+    rating=int(request.form["rating"]),
+    img=None  # default, no image
+    ).save()
 
         Tool(
             name=request.form["name"],
