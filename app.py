@@ -181,6 +181,15 @@ def admin_dashboard():
                            total_tools=Tool.objects().count(),
                            total_orders=Order.objects().count())
 
+@app.route("/admin/tools")
+def admin_tools():
+    if "admin" not in session:
+        return redirect("/admin")  # redirect to login if not logged in
+    
+    tools = Tool.objects()  # MongoDB fetch all tools
+    return render_template("admin_tools.html", tools=tools)
+
+
 # ---------------------------------------------
 # 📌 ADD TOOL (CLOUDINARY UPLOAD)
 # ---------------------------------------------
