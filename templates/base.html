@@ -3,43 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <title>{{ title if title else "AgroSmart" }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Bootstrap CDN -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Custom CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   <style>
-    /* Navbar Gradient */
-    .navbar-custom{
-      background: linear-gradient(90deg,#4ac29a,#5b86e5);
-    }
-    /* Floating Language Button */
+    .navbar-custom{ background: linear-gradient(90deg,#4ac29a,#5b86e5); }
     #langBtn {
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        background: #00aaff;
-        color: white;
-        font-size: 22px;
-        padding: 10px 14px;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        z-index: 999;
+        position: fixed; bottom: 80px; right: 20px;
+        background: #00aaff; color: white; font-size: 22px;
+        padding: 10px 14px; border-radius: 50%;
+        cursor: pointer; box-shadow:0 4px 6px rgba(0,0,0,.3); z-index: 999;
     }
-    footer{
-      text-align:center;
-      padding:10px;
-      margin-top:50px;
-      background:#e8fdf1;
-      font-weight:500;
-    }
+    footer{ text-align:center; padding:10px; background:#e8fdf1; font-weight:500; }
   </style>
-
 </head>
+
 <body>
 
 <!-- 🌐 NAVBAR -->
@@ -48,7 +29,6 @@
 
     <a class="navbar-brand fw-bold text-light" href="/">AgroSmart</a>
 
-    <!-- Mobile Menu Button -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -62,12 +42,14 @@
         <li class="nav-item"><a class="nav-link" href="/equipment">Equipment</a></li>
         <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
 
-        <!-- 🛒 Cart -->
+        <!-- 🛒 CART -->
         <li class="nav-item">
-          <a class="nav-link" href="/cart">🛒 Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})</a>
+          <a class="nav-link" href="/cart">
+            🛒 Cart ({{ session.get('cart', [])|length }})
+          </a>
         </li>
 
-        <!-- 🔐 ADMIN SECTION -->
+        <!-- 🔐 ADMIN -->
         {% if session.get('admin') %}
         <li class="nav-item dropdown ms-3">
           <a class="nav-link dropdown-toggle text-warning fw-bold" href="#" data-bs-toggle="dropdown">
@@ -93,45 +75,36 @@
   </div>
 </nav>
 
-
-<!-- 🧱 CONTENT (PAGE BODY) -->
+<!-- 📌 PAGE CONTENT -->
 <div class="container my-4">
   {% block content %}{% endblock %}
 </div>
 
-
 <!-- 📌 FOOTER -->
 <footer>
-  🌱 AgroSmart © 2025 | Helping Farmers With Technology
+  🌱 AgroSmart © {{ 2025 }} | Helping Farmers With Technology
 </footer>
 
-
-<!-- 🌐 Floating Language Button -->
-<div id="langBtn" onclick="toggleTranslate()" title="Translate Language">🌐</div>
+<!-- 🌐 TRANSLATE BUTTON -->
+<div id="langBtn" onclick="toggleTranslate()">🌐</div>
 
 <script>
 function toggleTranslate(){
-  let el = document.getElementById("google_translate_element");
-  el.style.display = (el.style.display === "none") ? "block" : "none";
+  let el=document.getElementById("google_translate_element");
+  el.style.display = (el.style.display==="none") ? "block":"none";
 }
 </script>
 
-<!-- 🌍 Google Translate Script -->
 <div id="google_translate_element" style="display:none;"></div>
-<script type="text/javascript">
-function googleTranslateElementInit() {
+<script>
+function googleTranslateElementInit(){
   new google.translate.TranslateElement({
-    pageLanguage: 'en',
-    includedLanguages: 'en,hi,mr', // English, Hindi, Marathi
-    layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL
+    pageLanguage:'en', includedLanguages:'en,hi,mr'
   }, 'google_translate_element');
 }
 </script>
 <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
