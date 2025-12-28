@@ -199,19 +199,32 @@ def add_tool():
         return redirect("/admin")
 
     if request.method == "POST":
+        name = request.form["name"]
+        price = request.form["price"]
+        category = request.form["category"]
+        rating = int(request.form["rating"])
+        
+        # 📸 Upload image to Cloudinary
         image = request.files.get("img")
-        url = None
-        if image and allowed_file(image.filename):
-            upload = cloudinary.uploader.upload(image)
-            url = upload.get("secure_url")
+        img_url = None
 
+        if image and allowed_file(image.filename):
+            try:
+                upload = cloudinary.uploader.upload(image)
+                img_url = upload.get("secure_url")  # Cloud URL
+            except Exception as e:
+                print("Cloudinary Upload Error:", e)
+                return "❌ Image upload failed. Check Cloudinary keys."
+
+        # 💾 Save Tool in MongoDB
         Tool(
-            name=request.form["name"],
-            price=request.form["price"],
-            img=url,
-            category=request.form["category"],
-            rating=int(request.form["rating"])
+            name=name,
+            price=price,
+            img=img_url,
+            category=category,
+            rating=rating
         ).save()
+
         return redirect("/admin/tools")
 
     return render_template("add_tool.html")
@@ -227,19 +240,20 @@ def edit_tool(id):
     tool = Tool.objects(id=id).first()
 
     if request.method == "POST":
-        update_data = {
-            "name": request.form["name"],
-            "price": request.form["price"],
-            "category": request.form["category"],
-            "rating": int(request.form["rating"])
-        }
+        tool.name = request.form["name"]
+        tool.price = request.form["price"]
+        tool.category = request.form["category"]
+        tool.rating = int(request.form["rating"])
 
         image = request.files.get("img")
         if image and allowed_file(image.filename):
-            upload = cloudinary.uploader.upload(image)
-            update_data["img"] = upload.get("secure_url")
+            try:
+                upload = cloudinary.uploader.upload(image)
+                tool.img = upload.get("secure_url")
+            except:
+                return "❌ Error uploading image to Cloudinary"
 
-        tool.update(**update_data)
+        tool.save()
         return redirect("/admin/tools")
 
     return render_template("edit_tool.html", tool=tool)
