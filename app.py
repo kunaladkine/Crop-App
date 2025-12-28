@@ -306,6 +306,18 @@ def whatsapp_checkout():
     notify_admin(msg)
     return redirect(f"https://wa.me/{WHATSAPP_NUMBER}?text={quote(msg)}")
 
+@app.route("/admin/orders")
+def admin_orders():
+    if "admin" not in session:
+        return redirect("/admin")
+    
+    try:
+        orders = Order.objects()  # Fetch all orders
+    except Exception as e:
+        print("❌ Order Fetch Error:", e)
+        orders = []  # Continue page with empty list instead of crashing
+    
+    return render_template("admin_orders.html", orders=orders)
 
 # ---------- Run ----------
 if __name__ == "__main__":
