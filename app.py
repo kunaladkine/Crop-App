@@ -188,28 +188,28 @@ def admin_tools():
 # ---------- Add Tool (No Image Required) ----------
 @app.route("/admin/tools/add", methods=["GET", "POST"])
 def add_tool():
-    if "admin" not in session: return redirect("/admin")
+    if "admin" not in session:
+        return redirect("/admin")
 
     if request.method == "POST":
-        Tool(
-    name=request.form["name"],
-    price=request.form["price"],
-    category=request.form["category"],
-    rating=int(request.form["rating"]),
-    img=None  # default, no image
-    ).save()
+        name = request.form["name"]
+        price = request.form["price"]
+        category = request.form["category"]
+        rating = int(request.form["rating"])
 
+        # No image upload — store blank None
         Tool(
-            name=request.form["name"],
-            price=request.form["price"],
-            category=request.form["category"],
-            rating=int(request.form["rating"]),
-            img=img_url
+            name=name,
+            price=price,
+            category=category,
+            rating=rating,
+            img=None
         ).save()
 
         return redirect("/admin/tools")
 
     return render_template("add_tool.html")
+
 
 
 # ---------- Edit Tool ----------
