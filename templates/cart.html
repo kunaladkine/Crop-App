@@ -19,7 +19,10 @@
   <tbody>
     {% for item in cart_items %}
     <tr>
-      <td><img src="{{ url_for('static', filename='uploads/' + item.img) }}" width="80" class="rounded"></td>
+      <td><img src="{{ item.img if item.img else url_for('static', filename='img/no-image.jpg') }}"
+     width="80"
+     style="object-fit:cover; border-radius:6px;">
+</td>
       <td class="fw-bold">{{ item.name }}</td>
       <td class="text-success fw-bold">₹{{ item.price }}</td>
       <td><a href="/cart/remove/{{ item.id }}" class="btn btn-danger btn-sm">❌</a></td>

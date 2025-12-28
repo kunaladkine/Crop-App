@@ -1,16 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from mongoengine import connect, Document, StringField, IntField
 from werkzeug.utils import secure_filename
-import pickle
-import numpy as np
-import requests
-import os
+import pickle, numpy as np, requests, os
 from urllib.parse import quote
-import cloudinary
-import cloudinary.uploader
+import cloudinary, cloudinary.uploader
 
 # ---------------------------------------------
-# 🌩️ CLOUDINARY CONFIG  (uses ENV variables)
+# 🌩️ CLOUDINARY CONFIG
 # ---------------------------------------------
 cloudinary.config(
   cloud_name = os.getenv("CLOUD_NAME"),
@@ -19,7 +15,7 @@ cloudinary.config(
 )
 
 # ---------------------------------------------
-# 🍃 MONGODB CONNECT
+# 🍃 MongoDB CONNECT
 # ---------------------------------------------
 connect(
     db="agrosmart",
@@ -27,10 +23,10 @@ connect(
 )
 
 # ---------------------------------------------
-# 🛠️ FLASK CONFIG
+# 🛠️ Flask App Config
 # ---------------------------------------------
 app = Flask(__name__)
-app.secret_key = "mysecretkey123"  # CHANGE FOR PRODUCTION
+app.secret_key = "mysecretkey123"
 
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
@@ -40,21 +36,24 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # ---------------------------------------------
-# 🤖 ML MODEL LOAD
+# 🤖 ML Model Load
 # ---------------------------------------------
 model = pickle.load(open("crop_model.pkl", "rb"))
 
 # ---------------------------------------------
-# 📩 WHATSAPP API CONFIG
+# 📩 WhatsApp API
 # ---------------------------------------------
 WHATSAPP_NUMBER = "919130537754"
-PHONE_ID = os.getenv("PHONE_ID")  # From Vercel
-ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")  # From Vercel
+PHONE_ID = os.getenv("PHONE_ID")
+ACCESS_TOKEN = os.getenv("ACCESS_TOKEN")
 ADMIN_NUMBER = "919130537754"
-
 WHATSAPP_API_URL = f"https://graph.facebook.com/v18.0/{PHONE_ID}/messages"
 
 def notify_admin(order_message):
+    if not PHONE_ID or not ACCESS_TOKEN:
+        print("⚠️ WhatsApp API not configured. Skipping message.")
+        return
+
     payload = {
         "messaging_product": "whatsapp",
         "to": ADMIN_NUMBER,
@@ -71,12 +70,12 @@ def notify_admin(order_message):
         print("⚠️ WhatsApp Error:", e)
 
 # ---------------------------------------------
-# 📦 MONGO MODELS
+# 📦 Mongo Models
 # ---------------------------------------------
 class Tool(Document):
     name = StringField(required=True)
     price = StringField(required=True)
-    img = StringField()  # Cloud URL
+    img = StringField(default=None)        # ⭐ default None if no image
     category = StringField()
     rating = IntField(default=4)
 
@@ -87,9 +86,11 @@ class Order(Document):
     total = StringField(required=True)
     status = StringField(default="Pending")
 
+
 # ---------------------------------------------
-# 🌐 ROUTES
+# ROUTES
 # ---------------------------------------------
+
 API_KEY = "9c0c2542dea2526a323458a1e649491b"
 
 @app.route("/")
@@ -103,7 +104,7 @@ def home():
     tools = Tool.objects()[:3]
     return render_template("index.html", crops=crops, tools=tools)
 
-# 🌱 CROP PAGE
+# ---------- Crop Recommendation ----------
 @app.route("/crop", methods=["GET", "POST"])
 def crop():
     if request.method == "POST":
@@ -120,16 +121,16 @@ def crop():
             prediction = model.predict([data])[0]
             return render_template("crop_result.html", crop=prediction)
         except:
-            return "❌ Invalid values. Please enter numbers only."
+            return "❌ Invalid values. Enter only numbers"
     return render_template("crop_form.html")
 
-# 🌦 WEATHER PAGE
+# ---------- Weather ----------
 @app.route("/weather", methods=["GET", "POST"])
 def weather():
     weather_data = None
     city = None
     if request.method == "POST":
-        city = request.form["city"]
+        city = request.form['city']
         url = f"https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={API_KEY}&units=metric"
         res = requests.get(url)
         if res.status_code == 200:
@@ -139,12 +140,12 @@ def weather():
                 "temp": data["list"][i]["main"]["temp"],
                 "humidity": data["list"][i]["main"]["humidity"],
                 "description": data["list"][i]["weather"][0]["description"]
-            } for i in range(0, 40, 8)]
+            } for i in range(0,40,8)]
         else:
             weather_data = "error"
     return render_template("weather.html", weather_data=weather_data, city=city)
 
-# 🛠 TOOLS SHOP
+# ---------- Equipment ----------
 @app.route("/equipment")
 def equipment():
     tools = Tool.objects()
@@ -156,9 +157,7 @@ def about():
     return render_template("about.html")
 
 
-# ---------------------------------------------
-# 🔐 ADMIN SYSTEM
-# ---------------------------------------------
+# ---------- Admin ----------
 @app.route("/admin", methods=["GET", "POST"])
 def admin_login():
     if request.method == "POST":
@@ -175,68 +174,50 @@ def admin_logout():
 
 @app.route("/admin/dashboard")
 def admin_dashboard():
-    if "admin" not in session:
-        return redirect("/admin")
+    if "admin" not in session: return redirect("/admin")
     return render_template("admin_dashboard.html",
                            total_tools=Tool.objects().count(),
                            total_orders=Order.objects().count())
 
 @app.route("/admin/tools")
 def admin_tools():
-    if "admin" not in session:
-        return redirect("/admin")  # redirect to login if not logged in
-    
-    tools = Tool.objects()  # MongoDB fetch all tools
+    if "admin" not in session: return redirect("/admin")
+    tools = Tool.objects()
     return render_template("admin_tools.html", tools=tools)
 
-
-# ---------------------------------------------
-# 📌 ADD TOOL (CLOUDINARY UPLOAD)
-# ---------------------------------------------
+# ---------- Add Tool (No Image Required) ----------
 @app.route("/admin/tools/add", methods=["GET", "POST"])
 def add_tool():
-    if "admin" not in session:
-        return redirect("/admin")
+    if "admin" not in session: return redirect("/admin")
 
     if request.method == "POST":
-        name = request.form["name"]
-        price = request.form["price"]
-        category = request.form["category"]
-        rating = int(request.form["rating"])
-        
-        # 📸 Upload image to Cloudinary
         image = request.files.get("img")
         img_url = None
 
-        if image and allowed_file(image.filename):
+        if image and image.filename != "" and allowed_file(image.filename):
             try:
                 upload = cloudinary.uploader.upload(image)
-                img_url = upload.get("secure_url")  # Cloud URL
-            except Exception as e:
-                print("Cloudinary Upload Error:", e)
-                return "❌ Image upload failed. Check Cloudinary keys."
+                img_url = upload.get("secure_url")
+            except:
+                img_url = None  # ⭐ If fails, still save tool
 
-        # 💾 Save Tool in MongoDB
         Tool(
-            name=name,
-            price=price,
-            img=img_url,
-            category=category,
-            rating=rating
+            name=request.form["name"],
+            price=request.form["price"],
+            category=request.form["category"],
+            rating=int(request.form["rating"]),
+            img=img_url
         ).save()
 
         return redirect("/admin/tools")
 
     return render_template("add_tool.html")
 
-# ---------------------------------------------
-# ✏️ EDIT TOOL
-# ---------------------------------------------
+
+# ---------- Edit Tool ----------
 @app.route("/admin/tools/edit/<id>", methods=["GET", "POST"])
 def edit_tool(id):
-    if "admin" not in session:
-        return redirect("/admin")
-
+    if "admin" not in session: return redirect("/admin")
     tool = Tool.objects(id=id).first()
 
     if request.method == "POST":
@@ -246,32 +227,29 @@ def edit_tool(id):
         tool.rating = int(request.form["rating"])
 
         image = request.files.get("img")
-        if image and allowed_file(image.filename):
+        if image and image.filename != "" and allowed_file(image.filename):
             try:
-                upload = cloudinary.uploader.upload(image)
-                tool.img = upload.get("secure_url")
+                tool.img = cloudinary.uploader.upload(image).get("secure_url")
             except:
-                return "❌ Error uploading image to Cloudinary"
+                pass
 
         tool.save()
         return redirect("/admin/tools")
 
     return render_template("edit_tool.html", tool=tool)
 
-# 🗑 DELETE TOOL
+
+# ---------- Delete ----------
 @app.route("/admin/tools/delete/<id>")
 def delete_tool(id):
-    if "admin" not in session:
-        return redirect("/admin")
+    if "admin" not in session: return redirect("/admin")
     Tool.objects(id=id).first().delete()
     return redirect("/admin/tools")
 
-# ---------------------------------------------
-# 🛒 CART SYSTEM
-# ---------------------------------------------
-def init_cart():
-    if "cart" not in session:
-        session["cart"] = []
+
+# ---------- Cart System ----------
+def init_cart(): 
+    if "cart" not in session: session["cart"] = []
 
 @app.route("/cart")
 def view_cart():
@@ -282,8 +260,7 @@ def view_cart():
 @app.route("/cart/add/<id>")
 def add_to_cart(id):
     init_cart()
-    if id not in session["cart"]:
-        session["cart"].append(id)
+    if id not in session["cart"]: session["cart"].append(id)
     session.modified = True
     return redirect("/cart")
 
@@ -299,79 +276,39 @@ def clear_cart():
     session["cart"] = []
     return redirect("/cart")
 
-# ---------------------------------------------
-# 💳 CHECKOUT + WHATSAPP
-# ---------------------------------------------
+
+# ---------- Checkout + WhatsApp ----------
 @app.route("/checkout", methods=["GET", "POST"])
 def checkout():
-    if not session.get("cart"):
-        return redirect("/cart")
-
+    if not session.get("cart"): return redirect("/cart")
     if request.method == "POST":
         return redirect(f"/checkout/whatsapp?name={request.form['name']}&phone={request.form['phone']}")
-
     return render_template("checkout.html")
 
 @app.route("/checkout/whatsapp")
 def whatsapp_checkout():
-    if not session.get("cart"):
-        return redirect("/cart")
-
+    if not session.get("cart"): return redirect("/cart")
+    
     name = request.args.get("name")
     phone = request.args.get("phone")
-
     tools = Tool.objects(id__in=session["cart"])
+    
     items = [f"{t.name} - {t.price}" for t in tools]
     total = sum(int(''.join(filter(str.isdigit, t.price))) for t in tools)
 
-    # Save order to MongoDB
     Order(customer_name=name, customer_phone=phone,
           items="\n".join(items), total=f"₹{total}").save()
 
-    # Admin message
-    msg = f"""
-🚨 *New Order Received*  
+    msg = f"""🚨 *New Order*
 👤 {name} | 📞 {phone}
 🛍 Items:
 {chr(10).join(items)}
-💰 Total: ₹{total}
-"""
+💰 Total: ₹{total}"""
+
     notify_admin(msg)
+    return redirect(f"https://wa.me/{WHATSAPP_NUMBER}?text={quote(msg)}")
 
-    # Redirect customer to WhatsApp
-    encoded = quote(msg)
-    return redirect(f"https://wa.me/{WHATSAPP_NUMBER}?text={encoded}")
 
-# ---------------------------------------------
-# 📦 ORDER MANAGEMENT (ADMIN)
-# ---------------------------------------------
-@app.route("/admin/orders")
-def admin_orders():
-    if "admin" not in session:
-        return redirect("/admin")
-    return render_template("admin_orders.html", orders=Order.objects())
-
-@app.route("/admin/orders/update/<id>", methods=["GET", "POST"])
-def update_order(id):
-    if "admin" not in session:
-        return redirect("/admin")
-
-    order = Order.objects(id=id).first()
-    if request.method == "POST":
-        order.update(status=request.form["status"])
-        return redirect("/admin/orders")
-
-    return render_template("order_update.html", order=order)
-
-@app.route("/admin/orders/delete/<id>")
-def delete_order(id):
-    if "admin" not in session:
-        return redirect("/admin")
-    Order.objects(id=id).first().delete()
-    return redirect("/admin/orders")
-
-# ---------------------------------------------
-# 🚀 RUN APP
-# ---------------------------------------------
+# ---------- Run ----------
 if __name__ == "__main__":
     app.run(debug=True)
