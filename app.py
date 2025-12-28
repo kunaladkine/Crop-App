@@ -6,6 +6,14 @@ import numpy as np
 import requests
 import os
 from urllib.parse import quote
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+  cloud_name = os.getenv("CLOUD_NAME"),
+  api_key = os.getenv("CLOUD_API_KEY"),
+  api_secret = os.getenv("CLOUD_API_SECRET")
+)
 
 # ------------------ MONGO DB CONNECTION ------------------
 connect(
@@ -196,7 +204,20 @@ def add_tool():
 
         if image and allowed_file(image.filename):
             filename = secure_filename(image.filename)
-            image.save(os.path.join(UPLOAD_FOLDER, filename))
+            image = request.files.get("img")
+url = None
+
+if image:
+    upload = cloudinary.uploader.upload(image)
+    url = upload.get("secure_url")  # URL of uploaded image
+
+Tool(
+    name = request.form["name"],
+    price = request.form["price"],
+    img = url,
+    category = request.form["category"],
+    rating = int(request.form["rating"])
+).save()
 
         Tool(
             name=request.form["name"],

@@ -22,8 +22,8 @@
             
             <span class="badge bg-success position-absolute top-0 end-0 mt-2 me-2">New</span>
             
-            <img src="{{ url_for('static', filename='uploads/' + item.img) }}"
-     class="card-img-top" style="height:220px; object-fit:cover;">
+            <!-- FIXED IMAGE -->
+            <img src="{{ item.img }}" class="card-img-top" style="height:220px; object-fit:cover;">
 
             <div class="card-body">
                 <h5 class="fw-bold">{{ item.name }}</h5>
@@ -38,9 +38,7 @@
                 
                 <p class="fs-4 text-success fw-bold">{{ item.price }}</p>
                 
-                <a href="/cart/add/{{ item.id }}" class="btn btn-primary w-100 mt-2">
-  🛒 Add to Cart
-</a>
+                <a href="/cart/add/{{ item.id }}" class="btn btn-primary w-100 mt-2">🛒 Add to Cart</a>
             </div>
         </div>
     </div>
@@ -68,6 +66,5 @@ function filterTools() {
 searchBox.addEventListener("input", filterTools);
 categoryFilter.addEventListener("change", filterTools);
 </script>
-
 
 {% endblock %}
